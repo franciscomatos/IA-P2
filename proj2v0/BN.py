@@ -7,6 +7,7 @@ Created on Mon Oct 15 15:51:49 2018
 """
 
 import numpy as np
+import itertools as it
 np.set_printoptions(precision=20, suppress=True)
 
 class Node():
@@ -29,7 +30,29 @@ class Node():
 
                 
 
+def isPost(n):
+    return n == -1
+
+def isUnknown(n):
+    return isinstance(n, list)
+
+def computeEvids(evid, x, y, val):
+    evidsList = []
+
+    l = list(it.product([0,1], repeat=len(y)))
+
+    for possibility in l:
+        aux = list(evid)
+        aux[x[0]] = val
+        for i in range(len(y)):
+            aux[y[i]] = possibility[i]
+        evidsList.append(aux)
+
     
+    return evidsList
+
+        
+
 class BN():
     # gra - parents array
     # prob - nodes array
@@ -39,9 +62,36 @@ class BN():
         
 
     def computePostProb(self, evid):
-        pass
-               
-        return 0
+        num = 0
+        x = []
+        y = []
+        e = []
+        i = 0
+        # reads the index of the relevant nodes
+        for ev in evid:
+            if isUnknown(ev):
+                y.append(i)
+            elif isPost(ev):
+                x.append(i)
+            else:
+                e.append(i)
+            i += 1
+        p = 0
+        p2 = 0
+        alpha = 0
+        numEv = computeEvids(evid, x, y, 1)
+        denEv = computeEvids(evid, x, y, 0)
+
+        for e in numEv:   
+            p += self.computeJointProb(e)
+
+        for e in denEv:
+            p2 += self.computeJointProb(e)
+
+        alpha = p + p2
+        return p/alpha
+            
+
         
         
     def computeJointProb(self, evid):
@@ -54,37 +104,3 @@ class BN():
         
         return p
 
-if __name__ == "__main__":
-    ev = (1,1,1,1,1)
-    
-    p1 = Node( np.array([.001]), [] )
-    print(p1.computeProb(ev))
-
-    p3 = Node( np.array([[.001,.29],[.94,.95]]), [0,1] )
-    print(p3.computeProb(ev))
-    ev = (0,0,1,1,1)
-
-    print(p3.computeProb(ev))
-    ev = (0,1,1,1,1)
-    print(p3.computeProb(ev))
-
-    ev = (1,0,1,1,1)
-    print(p3.computeProb(ev))
-
-    ev = (1,1,1,1,1)
-    print(p3.computeProb(ev))
-
-    prob = [p1,p2,p3,p4,p5]
-
-    gra = [[],[],[0,1],[2],[2]]
-    bn = BN(gra, prob)
-
-    jp = []
-    for e1 in [0,1]:
-        for e2 in [0,1]:
-            for e3 in [0,1]:
-                for e4 in [0,1]:
-                    for e5 in [0,1]:
-                        jp.append(bn.computeJointProb((e1, e2, e3, e4, e5)))
-
-    print("sum joint %.3f (1)" % sum(jp))
