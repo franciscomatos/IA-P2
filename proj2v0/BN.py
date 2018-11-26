@@ -31,8 +31,12 @@ class Node():
 
     
 class BN():
+    # gra - parents array
+    # prob - nodes array
     def __init__(self, gra, prob):
-        pass
+        self.gra = gra
+        self.prob = prob
+        
 
     def computePostProb(self, evid):
         pass
@@ -41,9 +45,14 @@ class BN():
         
         
     def computeJointProb(self, evid):
-        pass
+        p = 1
+        i = 0
+
+        for prob in self.prob:
+            p *= prob.computeProb(evid)[evid[i]]
+            i += 1
         
-        return 0
+        return p
 
 if __name__ == "__main__":
     ev = (1,1,1,1,1)
@@ -64,3 +73,18 @@ if __name__ == "__main__":
 
     ev = (1,1,1,1,1)
     print(p3.computeProb(ev))
+
+    prob = [p1,p2,p3,p4,p5]
+
+    gra = [[],[],[0,1],[2],[2]]
+    bn = BN(gra, prob)
+
+    jp = []
+    for e1 in [0,1]:
+        for e2 in [0,1]:
+            for e3 in [0,1]:
+                for e4 in [0,1]:
+                    for e5 in [0,1]:
+                        jp.append(bn.computeJointProb((e1, e2, e3, e4, e5)))
+
+    print("sum joint %.3f (1)" % sum(jp))
