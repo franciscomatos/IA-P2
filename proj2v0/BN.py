@@ -19,7 +19,7 @@ class Node():
         nParents = len(self.parents)
         p = self.prob # gonna select a probability from the array
         i = 0
-        if nParents == 0:
+        if nParents == 0: 
             return [1 - self.prob[0], self.prob[0]]
         else:
             for parent in self.parents:
@@ -36,15 +36,21 @@ def isPost(n):
 def isUnknown(n):
     return isinstance(n, list)
 
+# given the original evid, the posterior and unknown variables index, returns a list of all possible evids 
+# evid - original evid
+# x - posterior variable index
+# y - unknown variables index
+# val - 1 or 0, depending on whether the posterior variable is true or not 
 def computeEvids(evid, x, y, val):
     evidsList = []
 
+    # list of all possible combinations of the unknown variables
     l = list(it.product([0,1], repeat=len(y)))
 
     for possibility in l:
         aux = list(evid)
-        aux[x[0]] = val
-        for i in range(len(y)):
+        aux[x[0]] = val # changes the posterior variable
+        for i in range(len(y)): # changes the unknown variables
             aux[y[i]] = possibility[i]
         evidsList.append(aux)
 
@@ -54,19 +60,14 @@ def computeEvids(evid, x, y, val):
         
 
 class BN():
-    # gra - parents array
-    # prob - nodes array
     def __init__(self, gra, prob):
-        self.gra = gra
-        self.prob = prob
+        self.gra = gra # parents array
+        self.prob = prob # nodes array
         
 
     def computePostProb(self, evid):
-        num = 0
-        x = []
-        y = []
-        e = []
-        i = 0
+        x, y, e = [], [], []
+        num, i , p, p2, alpha = 0, 0, 0, 0, 0
         # reads the index of the relevant nodes
         for ev in evid:
             if isUnknown(ev):
@@ -76,9 +77,7 @@ class BN():
             else:
                 e.append(i)
             i += 1
-        p = 0
-        p2 = 0
-        alpha = 0
+
         numEv = computeEvids(evid, x, y, 1)
         denEv = computeEvids(evid, x, y, 0)
 
