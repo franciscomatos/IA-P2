@@ -35,8 +35,11 @@ absorv = np.zeros((7,1))
 absorv[[0,6]]=1
 fmdp = RL.finiteMDP(7,2,0.9,Pl,Rl,absorv)
 
-J,traj = fmdp.runPolicy( " choose this value ",3,poltype = "exploration")
+
+J,traj = fmdp.runPolicy(7, 3 , poltype = "exploration")
+
 data = np.load("Q1.npz")
+
 Qr = fmdp.traces2Q(traj)
 if np.sqrt(sum(sum((data['Q1']-Qr)**2)))<1:
     print("Aproximação de Q dentro do previsto. OK\n")

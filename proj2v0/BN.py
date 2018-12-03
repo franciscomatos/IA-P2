@@ -19,14 +19,15 @@ class Node():
         nParents = len(self.parents)
         p = self.prob # gonna select a probability from the array
         i = 0
+        
         if nParents == 0: 
             return [1 - self.prob[0], self.prob[0]]
-        else:
-            for parent in self.parents:
-                e = evid[parent] # relevant evid value
-                p = p[e]         # if e = 0, first parent false, index = 0
-                                 # if e = 1, first parent true, index = 1
-            return [1 - p, p]
+        
+        for parent in self.parents:
+            e = evid[parent] # relevant evid value
+            p = p[e]         # if e = 0, first parent false, index = 0
+                                # if e = 1, first parent true, index = 1
+        return [1 - p, p]
 
                 
 
