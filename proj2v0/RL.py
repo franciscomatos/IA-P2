@@ -18,7 +18,7 @@ class finiteMDP:
         self.nS = nS
         self.nA = nA
         self.gamma = gamma
-        self.alpha = 0.6
+        self.alpha = 0.45
         self.Q = np.zeros((self.nS,self.nA))
         self.P = P
         self.R = R
@@ -79,7 +79,8 @@ class finiteMDP:
 
                 self.Q[initialState][action] = self.Q[initialState][action]  + self.alpha * (reward + self.gamma*max(self.Q[finalState]) - self.Q[initialState][action])
 
-            if np.linalg.norm(self.Q - Qant) <= 0.1:
+            print(np.linalg.norm(self.Q - Qant))
+            if np.linalg.norm(self.Q - Qant) <= 1:
                 return self.Q
 
 
