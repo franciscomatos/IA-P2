@@ -18,7 +18,7 @@ class finiteMDP:
         self.nS = nS
         self.nA = nA
         self.gamma = gamma
-        self.alpha = 0.1
+        self.alpha = 0.6
         self.Q = np.zeros((self.nS,self.nA))
         self.P = P
         self.R = R
@@ -40,7 +40,7 @@ class finiteMDP:
             if self.absorv[x]:
                 y = x0
             x = y
-        
+
         return J,traj
 
 
@@ -67,43 +67,32 @@ class finiteMDP:
     def traces2Q(self, trace):
         #Q i-1
         Qant = np.zeros((self.nS,self.nA))
-        maxDiff = 1
 
-        nStates = len(trace)
-        nElements = len(self.Q[0])
+        while 1:
+            for state in trace:
+                reward = int(state[3])
+                finalState = int(state[2])
+                initialState = int(state[0])
+                action = int(state[1])
 
-        while maxDiff > 0.0001:
-            auxDiff = 0
-            for i in range(nStates):
-                reward = trace[i][3]
-                finalState = int(trace[i][2])
-                initialState = int(trace[i][0])
-                action = trace[i][1]
-            
-                self.Q[initialState][action] = Qant[initialState][action]  + self.alpha * (reward + self.gamma*max(self.Q[finalState]) - Qant[initialState][action])
-                if math.fabs(self.Q[initialState][action] - Qant[initialState][action]) > auxDiff:
-                    auxDiff = math.fabs(self.Q[initialState][action] - Qant[initialState][action])
                 Qant[initialState][action] = self.Q[initialState][action]
 
-            if auxDiff < maxDiff:      
-                maxDiff = auxDiff
-        
+                self.Q[initialState][action] = self.Q[initialState][action]  + self.alpha * (reward + self.gamma*max(self.Q[finalState]) - self.Q[initialState][action])
 
-        return self.Q
+            if np.linalg.norm(self.Q - Qant) <= 0.1:
+                return self.Q
+
+
     
     def policy(self, x, poltype = 'exploration', par = []):
         # implementar esta funcao
-        
-        if poltype == 'exploitation':
-            #b = max(self.Q[x][0], self.Q[x][1], self.Q[x][2], self.Q[x][3])
-       
-            a = np.argmax(self.Q[x])
+        if poltype == 'exploitation': 
+            a = np.argmax(par[x])
 
             
         elif poltype == 'exploration':
-            a = random.choice([0,1])
+            a = random.randint(0, len(self.Q[0])-1)
 
-                
         return a
     
     def Q2pol(self, Q, eta=5):
