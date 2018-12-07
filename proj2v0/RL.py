@@ -70,16 +70,15 @@ class finiteMDP:
 
         while 1:
             for state in trace:
-                reward = int(state[3])
-                finalState = int(state[2])
                 initialState = int(state[0])
                 action = int(state[1])
+                finalState = int(state[2])
+                reward = int(state[3])
 
                 Qant[initialState][action] = self.Q[initialState][action]
 
                 self.Q[initialState][action] = self.Q[initialState][action]  + self.alpha * (reward + self.gamma*max(self.Q[finalState]) - self.Q[initialState][action])
 
-            print(np.linalg.norm(self.Q - Qant))
             if np.linalg.norm(self.Q - Qant) <= 1:
                 return self.Q
 
